@@ -1,0 +1,68 @@
+\documentclass[11pt]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{amsmath,amssymb,xcolor,graphicx,booktabs,hyperref}
+\graphicspath{{reports/figures/}{figures/}}
+\title{Graph Analysis of DiT Token Activations: E-2--E-7}
+\author{}
+\date{}
+\begin{document}
+\maketitle
+We use 50 trajectories, 450 separate token snapshots, and original 1152-dimensional
+features. The fixed illustrative snapshot is golden retriever, replicate 0,
+denoiser call 25, block 14. The main detailed graph setting is $k=16$;
+large components have at least 32 vertices. All six detailed $k$ settings
+have per-component results and plots in the generated-data directory.
+\begin{enumerate}
+\renewcommand{\labelenumi}{E-\arabic{enumi}}
+\setcounter{enumi}{1}
+\input{answers_e2_e7.tex}
+\end{enumerate}
+\clearpage
+\begin{figure}[p]
+\centering
+\includegraphics[width=\linewidth]{e2_pairwise_interactions.pdf}
+\caption{E-2: weighted interaction matrix and pair distributions.}
+\end{figure}
+\begin{figure}[p]
+\centering
+\includegraphics[width=\linewidth]{e3_connectivity_all.pdf}
+\caption{E-3: component-count curves; mean and observed range over 50 trajectories per condition.}
+\end{figure}
+\begin{figure}[p]
+\centering
+\includegraphics[width=\linewidth]{e4_e5_k16_component00.pdf}
+\caption{E-4/E-5: representative degree, clustering, spectrum, embeddings and nodal domains.}
+\end{figure}
+\begin{figure}[p]
+\centering
+\includegraphics[width=\linewidth]{e5_fiedler_all.pdf}
+\caption{E-5: mean and observed range of Fiedler values among connected graphs.}
+\end{figure}
+\begin{figure}[p]
+\centering
+\includegraphics[width=\linewidth]{e5_e7_original_data.pdf}
+\caption{E-5/E-7: nodal domains, final image and measured updates.}
+\end{figure}
+\begin{figure}[p]
+\centering
+\includegraphics[width=\linewidth]{e6_clustering_comparison.pdf}
+\caption{E-6: two-cluster k-means and selected nodal partitions; comparisons conditional on two complete domains.}
+\end{figure}
+\begin{figure}[p]
+\centering
+\includegraphics[width=\linewidth]{e7_attribute_smoothness.pdf}
+\caption{E-7: graph-signal energy relative to random node permutations.}
+\end{figure}
+\begin{figure}[p]
+\centering
+\includegraphics[width=\linewidth]{e7_cross_layer_neighbors.pdf}
+\caption{E-7: same-token neighbor retention across layers.}
+\end{figure}
+\clearpage
+\begin{thebibliography}{9}
+\bibitem{luxburg} U. von Luxburg, A Tutorial on Spectral Clustering, 2007.
+\url{https://www.cs.columbia.edu/~jebara/6772/papers/Luxburg07_tutorial.pdf}
+\bibitem{nodal} E. B. Davies, G. M. L. Gladwell, J. Leydold and P. F. Stadler,
+Discrete Nodal Domain Theorems, 2001.
+\end{thebibliography}
+\end{document}

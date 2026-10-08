@@ -78,114 +78,136 @@ condition manifest are tracked. `run_sharded.py` assigns manifest rows by
 stable index modulo the number of selected GPUs and writes worker logs under
 `data/generated/dit_xl2_logs/`.
 
-## Project analysis plan
+## Completed graph experiment: E-2 through E-7
 
-**针对这份 E-1～E-7，我建议把设计收敛成：一个模型、一个 sampler、50 个生成样本，在不同层和采样阶段采集 token activation，完成一套图分析，最后加一个小规模的加速可行性实验。**
+The main feature is the **original 1152-dimensional block-input activation**.
+No PCA, channel selection, or feature normalization is applied in these results.
+Each trajectory/call/block snapshot forms a separate graph of 256 token observations.
+A datum is identified by its trajectory, denoiser call, block, and token index.
+The update, token-grid position, class, diffusion timestep, and seed are retained
+as attributes for interpretation. The independent experimental units are the
+50 generation trajectories, rather than the 115,200 individual observations.
 
-我前面建议“两种 sampler＋完整 50-step trajectory”，偏向后续研究的数据储备，**不是这次课程作业的必要规模**。这次更重要的是：数据定义清楚、图构造合理、分析完整，而且结论能为后续加速提供信息。
+### Read the results
 
-## 1. 项目研究什么？
+- [PDF report](reports/experiment_report.pdf): figures and measured findings.
+- [Answers E-2–E-7](reports/answers_e2_e7.tex): one English LaTeX answer per question,
+  ready to copy into the assignment.
+- [Standalone LaTeX report](reports/experiment_report.tex): includes the same answers
+  and vector figures; compile from `reports/` if a TeX installation is available.
+- [Measured summary and hashes](reports/results_summary.json).
+- [Curated figures](reports/figures/): PNG previews and vector PDF exports.
 
-建议题目就叫：
+| Question | Implemented method | Measured result |
+|---|---|---|
+| E-2 | Gaussian affinity on raw activation distances; median-distance bandwidth per snapshot | 450 weighted 256×256 matrices |
+| E-3 | Undirected union-kNN, all integer k from 2 through 64 | 315/450 graphs connected at k=2; all connected by k=15 |
+| E-4 | Unweighted degree and local clustering distributions, components of at least 32 vertices | 2,739 component cases at k=2,4,8,16,32,64; all 450 main-k=16 degree distributions right-skewed |
+| E-5 | Weighted normalized Laplacian, first 32 eigenvalues, 3D eigenvector embeddings, strict nodal domains | Representative selects q3 with eigenvalue 0.225608 and two domains; 17/450 main graphs lack a qualifying separated eigenvalue |
+| E-6 (optional) | K=2 k-means on raw activations, five reproducible initializations | 450 partitions; 348 snapshots have a complete two-domain nodal partition for comparison |
+| E-7 | Update graph energy and cosine similarity, spatial coherence, cross-layer neighbor retention | At k=16, mean update-vector energy/null ratio 0.617; neighbor retention 0.505 for blocks 4→14 and 0.539 for 14→24 |
 
-> **Graph Structure of Token Activations and Updates in Diffusion Transformers**
+The fixed illustrative snapshot is `imagenet-0207-r00`, call 25, block 14.
+The main detailed setting is **k=16**, at which all 450 graphs have one
+256-vertex component. Connected-component curves and Fiedler curves cover
+every integer k=2,…,64; detailed component distributions and embeddings cover
+k=2,4,8,16,32,64. Per-component plots exist for every large component at these
+six settings. All six settings are retained, so the report's representative
+example is accompanied by the full results rather than selected for appearance.
 
-主问题是：
+### Reproduce the analysis
 
-> **Diffusion token 的 activation 是否形成可解释的图结构？这些结构与 token 在当前 block 中的更新有什么关系？**
+Analysis uses the CPU and does not need PyTorch or a GPU. Start with the generated
+traces described above. The pinned analysis environment uses Python 3.10.20;
+the four direct numerical/plotting dependencies are in `requirements-analysis.txt`.
 
-这样分工很清楚：**activation 是构图依据，block update 是用来解释图结构的属性，推理加速是 downstream motivation。** 不预设一定做 reuse、merge 或 FP8。
+```bash
+python -m venv .venv
+.venv/bin/python -m pip install -r requirements-analysis.txt
 
-## 2. 数据集：我建议直接固定这个版本
+# Complete E-2–E-7 calculation, all component plots, and report.
+.venv/bin/python scripts/run_graph_experiment.py --workers 4 --plot-workers 8
 
-| 项目 | 建议配置 |
+# After calculation, refresh the report without rerendering 2,739 component plots.
+.venv/bin/python scripts/run_graph_experiment.py --from-results --skip-component-plots
+```
+
+Individual stages are also available:
+
+```bash
+.venv/bin/python scripts/build_interactions.py
+.venv/bin/python scripts/analyze_graphs.py --workers 4
+.venv/bin/python scripts/analyze_attributes.py
+.venv/bin/python scripts/compare_clustering.py
+.venv/bin/python scripts/plot_experiment.py --workers 8
+.venv/bin/python scripts/plot_clustering_comparison.py
+.venv/bin/python scripts/write_experiment_report.py
+```
+
+The graph outputs stay in `data/generated/graph_analysis/` and are ignored by Git:
+
+| Output | Contents |
 |---|---|
-| **模型** | DiT-XL/2，ImageNet-256；该设置为 256 个空间 token、hidden dimension 1152。[GitHub](https://github.com/facebookresearch/DiT/blob/main/models.py) |
-| **Sampler** | DDIM，\(\eta=0\)，50 次 denoiser 调用；固定为确定性采样。[arXiv](https://arxiv.org/html/2010.02502v4?utm_source=chatgpt.com) |
-| **生成样本** | 预先选定 10 个类别，每类 5 个独立初始噪声，共 50 条轨迹 |
-| **采样位置** | 第 10、25、40 次 denoiser 调用，同时记录真实 diffusion timestep |
-| **分析层** | 第 4、14、24 个 block，按 1-based 编号，覆盖浅层、中层、深层 |
-| **保存内容** | Token 的 block 输入、block 更新、空间位置，以及生成配置和最终图像 |
-| **特征维度** | 主实验 \(d=16\)，补充比较 \(d=8,32\) |
+| `metadata.json`, `index.jsonl` | Configuration, fixed representative, snapshot indices and SHA-256 provenance |
+| `interactions/` | All-to-all affinity, squared distance, bandwidth, and stable neighbor order |
+| `connectivity.csv` | 28,350 graph records (450 snapshots × 63 k values) |
+| `connectivity_summary.json` | First connected k in the scanned range, and component curves |
+| `component_summary.csv`, `components/` | 2,739 large-component cases; distributions, eigenvalues, embeddings, nodal labels, update attributes |
+| `component_plots/`, `component_plot_index.json` | One six-panel figure per large component at the six detailed k values |
+| `fiedler_curves.csv`, `nodal_groups.csv` | Connected-graph Fiedler values and nodal-domain statistics |
+| `attributes.csv`, `attribute_summary.json` | Update/spatial graph signals and trajectory-level summaries |
+| `cross_layer_neighbors.csv` | Directed same-token neighbor overlap between the recorded blocks |
+| `optional_clustering.csv`, `baseline_clusters/` | k-means seeds, partitions, objectives and comparable nodal-partition agreement |
 
-**针对课程作业，我会把之前的连续 13/14/15 层改成浅／中／深三层。** 因为这次首先需要观察结构随网络深度如何变化；连续层之间的相关性，可以留到后面的加速研究。
+A clone includes code, the exact sampling manifest, the report, and curated figures.
+It regenerates the activation arrays by sampling the pinned checkpoint; it does
+not download an ImageNet photograph subset. Re-running analysis on the same
+saved arrays fixes neighbor ties and clustering seeds. Floating-point results
+can vary slightly with the numerical library and hardware; hashes identify the
+actual inputs used for the committed report.
 
-### 每个 datum 的定义
+### Definitions and interpretation
 
-**一个 datum = 一条生成轨迹在某次调用、某个 block 中的一个空间 token observation。**
-
-记录同一 block 的输入 \(h_i^{\mathrm{in}}\) 和输出 \(h_i^{\mathrm{out}}\)，定义更新 \(r_i=h_i^{\mathrm{out}}-h_i^{\mathrm{in}}\)。这里取的是整个 block 前后的 residual-stream 表示，不混用不同归一化位置；DiT 官方 block 本身就是在输入上依次加 attention 和 MLP 的更新。[GitHub](https://github.com/facebookresearch/DiT/blob/main/models.py)
-
-按上述配置，共有 **450 个 graph snapshots、115,200 个 token observations**。但独立生成轨迹仍是 50 条，不能把所有 token 当作独立重复实验。
-
-存储方面，可以保存 **FP16 的 \(H^{\mathrm{in}}\) 和 \(R\)** 两个数组，原始张量约 **506 MiB**，不含图片和元数据。建议采集时先用 FP32 计算差值 \(R\)，再转换为保存精度，而不是只留下两个 FP16 activation，之后才相减。
-
-## 3. Graph experiment：严格按照 E-1～E-7 来做
-
-**每个 sample／采样位置／block 单独构图，不把不同条件的 token 混成一个大图。**
-
-### E-1、E-2：从数据到特征，再到相互作用矩阵
-
-用 **block input activation** 做 PCA，得到 \(x_i=P_d(h_i^{\mathrm{in}})\)。建议每层用固定的参考样本拟合 PCA，不同采样位置沿用该层的投影；例如 10 条轨迹用于拟合与调试，另外 40 条用于主要分析。
-
-然后用非负的 Gaussian affinity：
+The all-to-all weights are
 
 \[
-S_{ij}=\exp\!\left(-\frac{\|x_i-x_j\|_2^2}{2\sigma^2}\right),\qquad S_{ii}=0.
+S_{ij}=\exp\left(-\frac{\|h_i^{\mathrm{in}}-h_j^{\mathrm{in}}\|_2^2}
+{2\sigma^2}\right),\qquad S_{ii}=0,
 \]
 
-第一版可以把 \(\sigma\) 定为该图非零 pairwise distances 的中位数，扫描不同 \(k\) 时保持不变。Gaussian affinity 配合 kNN 是标准的相似度图构造方式。[Max Planck Institute](https://people.kyb.tuebingen.mpg.de/ule/publications/publication_downloads/Luxburg06_TR.pdf?utm_source=chatgpt.com)
+where sigma is the median positive pairwise Euclidean distance in one snapshot.
+The Gaussian bandwidth stays fixed as k changes. Edge weights are similarities
+between activations, rather than attention weights. A pair is retained when
+either vertex selects the other among its k nearest neighbors; its weight
+remains the original affinity. Numerical work uses float64 on the saved FP16
+activations, which does not recover precision lost during storage.
 
-**当前 block 的真实更新 \(r_i\) 不参与主图构造。** 它留到后面用于解释结构和检验预测价值。
+Degree and local clustering use the unweighted adjacency. Spectral analysis uses
+`Lsym = I - D^(-1/2) W D^(-1/2)` with the retained nonnegative weights.
+For nodal analysis, we search nontrivial eigenvalue indices 2 through min(32, |G|-1) using
+absolute two-sided gaps of at least 1e-6 and a minimum-gap/eigenvalue ratio of
+at least 0.05, then maximize the minimum adjacent gap. The complete spectrum
+is computed to check the neighboring eigenvalue beyond the displayed first 32.
+Cases without a qualifying eigenpair are marked unavailable. Strict nodal domains
+are connected components in the positive and negative induced subgraphs;
+numerical zeros are marked separately. See the
+[spectral clustering tutorial](https://www.cs.columbia.edu/~jebara/6772/papers/Luxburg07_tutorial.pdf)
+for affinity graphs and the normalized Laplacian.
 
-### E-3～E-7：具体交付什么？
+The representative nodal domains have 131 and 125 tokens. Their mean update
+norms differ, but the partition explains only 2.53% of update-norm variance.
+The token-grid overlay is illustrative and does not accurately trace the dog's
+semantic boundary. There is no token-level semantic ground truth here.
 
-| 作业要求 | 我建议你们实际完成的内容 |
-|---|---|
-| **E-3：kNN 与连通分量** | 扫描 \(k=2,4,8,16,32,64\)。采用 union-kNN：任意一方把另一方选为邻居，就保留无向边。画 connected-component count 随 \(k\) 的变化。 |
-| **E-4：组合结构** | 对大连通分量画 degree distribution 和 local clustering coefficient distribution。第一版这两项用无权邻接关系计算，描述实际形状，不预设它们服从某种分布。 |
-| **E-5：谱分析** | 用保留下来的相似度作为边权，计算 normalized Laplacian；观察连通之后的 \(\lambda_2(k)\)，画前 25 个特征值、3D spectral embedding，并完成题目要求的 nodal-domain partition。 |
-| **E-6：可选方法** | 用 k-means 作为额外 clustering baseline，比较它与谱划分的结果。**这里放聚类对照，不把 token repair 当作 E-6 的替代。** |
-| **E-7：解释结果** | 将分组映射回图像 token 网格，比较不同组的更新大小、更新方向和空间分布，再比较浅／中／深层与早／中／晚采样位置。 |
+Across trajectories, update signals are smoother on activation graphs than
+under random node assignment, and neighbor relationships partly persist across
+layers. These findings motivate a later **cross-layer token-correction** study.
+Spatial coherence may account for part of the association. Correction error,
+rollout quality, and inference speed have not been measured in E-2–E-7.
+A future reconstruction experiment should compare graph transfer against
+spatial and global baselines on held-out trajectories before claiming an improvement.
 
-谱分析统一使用 \(L_{\mathrm{sym}}=I-D^{-1/2}WD^{-1/2}\)，其中 \(W\) 是对称、非负的加权邻接矩阵。这与上面的 Gaussian＋无向 kNN 构图一致。[Columbia University Computer Science](https://www.cs.columbia.edu/~jebara/6772/papers/Luxburg07_tutorial.pdf?utm_source=chatgpt.com)
-
-E-5 有一个细节要做好：**nodal domains 是特征向量同号节点形成的连通区域，不是简单地把所有正值节点归为一组、所有负值节点归为另一组。** 按题目要求寻找分离较好的非零简单特征值；没有找到时如实报告，不强行制造一个“很明显的 spectral gap”。
-
-展示时也不需要放 450 张图：选一个**预先固定**的 sample 展示完整分析流程，再对其余样本汇总统计，避免只挑视觉效果最好的例子。
-
-## 4. 加速怎么接？加一个小的“结构是否有用”实验
-
-**这里我建议只做一个候选验证，不要求这次作业完成加速系统。**
-
-最直接的候选是：
-
-> **在只观察部分 token 的真实更新时，activation graph 是否有助于估计其余 token 的更新？**
-
-例如，固定相同的 anchor tokens，分别观察 10%、20%、30% 的真实更新，比较：
-
-| 方法 | 对未观察 token 的处理 |
-|---|---|
-| **不修正** | 预测更新为零，即保留 block 输入 |
-| **全局修正** | 用已观察 anchor 的平均更新 |
-| **图局部修正** | 利用图邻域关系和 anchor 更新进行估计 |
-
-在未观察 token 上比较更新重建误差，画一张 **anchor fraction—reconstruction error** 曲线即可。测试样本不能用于选择最有利的参数。
-
-这个实验的价值是：
-
-**如果图局部修正有效，说明值得继续研究“少量精算＋局部修正”；如果无效，就说明当前图关系还不足以支持这个应用，而不是课程项目失败。**
-
-也要明确：这是**离线重建实验**。它尚未证明少算部分 token 就能按比例省时间，也没有计入构图、选择和修正成本。真正的 kernel、视频质量、ZEUS 联合使用和多卡延迟，属于后续加速工作。
-
-## 5. 这次不必做什么？
-
-**不必把多模型、多 sampler、全部 timestep、视频模型和 distributed execution 同时放进来。** 它们会扩大工作量，却不是老师这份要求的核心。
-
-主实验完成后，有余力再增加同一模型下的一种 sampler，作为补充稳健性检查；没有增加，就把结论明确限定在当前 checkpoint 和采样配置，不声称跨模型普适。
-
-最后，给老师的项目描述可以直接写成：
-
-> 我们构建 diffusion Transformer 的 token-level activation dataset，研究其在不同网络层和采样阶段的相似度图结构。通过 kNN 连通性、局部聚类和 Laplacian 谱分析，我们检验这些结构与 block 更新之间的关系，并初步探索它们能否支持选择性计算与局部更新预测。
-
-**我认为这就是合理的规模：一个受控的数据集、一套完整的课程分析、一个与加速有关的小验证。先把这三件事连起来，比先收集很多模型和 sampler 更有价值。**
+Feature dimension can be varied in a separate sensitivity experiment using a
+fixed nested channel ordering. This run uses all 1152 channels; no dimension
+sensitivity or acceleration experiment is claimed. The digit-image tasks after
+`\endinput` in the supplied assignment are outside this run's agreed scope.
