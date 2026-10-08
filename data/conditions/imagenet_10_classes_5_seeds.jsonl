@@ -1,0 +1,50 @@
+{"sample_id": "imagenet-0207-r00", "condition_type": "imagenet_class_id", "class_id": 207, "class_name": "golden retriever", "replicate": 0, "generation_seed": 2266854425}
+{"sample_id": "imagenet-0207-r01", "condition_type": "imagenet_class_id", "class_id": 207, "class_name": "golden retriever", "replicate": 1, "generation_seed": 2928548916}
+{"sample_id": "imagenet-0207-r02", "condition_type": "imagenet_class_id", "class_id": 207, "class_name": "golden retriever", "replicate": 2, "generation_seed": 1055552816}
+{"sample_id": "imagenet-0207-r03", "condition_type": "imagenet_class_id", "class_id": 207, "class_name": "golden retriever", "replicate": 3, "generation_seed": 91377112}
+{"sample_id": "imagenet-0207-r04", "condition_type": "imagenet_class_id", "class_id": 207, "class_name": "golden retriever", "replicate": 4, "generation_seed": 3076129702}
+{"sample_id": "imagenet-0281-r00", "condition_type": "imagenet_class_id", "class_id": 281, "class_name": "tabby", "replicate": 0, "generation_seed": 3439549462}
+{"sample_id": "imagenet-0281-r01", "condition_type": "imagenet_class_id", "class_id": 281, "class_name": "tabby", "replicate": 1, "generation_seed": 599060712}
+{"sample_id": "imagenet-0281-r02", "condition_type": "imagenet_class_id", "class_id": 281, "class_name": "tabby", "replicate": 2, "generation_seed": 4264178117}
+{"sample_id": "imagenet-0281-r03", "condition_type": "imagenet_class_id", "class_id": 281, "class_name": "tabby", "replicate": 3, "generation_seed": 3392171740}
+{"sample_id": "imagenet-0281-r04", "condition_type": "imagenet_class_id", "class_id": 281, "class_name": "tabby", "replicate": 4, "generation_seed": 896684642}
+{"sample_id": "imagenet-0340-r00", "condition_type": "imagenet_class_id", "class_id": 340, "class_name": "zebra", "replicate": 0, "generation_seed": 2418558968}
+{"sample_id": "imagenet-0340-r01", "condition_type": "imagenet_class_id", "class_id": 340, "class_name": "zebra", "replicate": 1, "generation_seed": 3635693052}
+{"sample_id": "imagenet-0340-r02", "condition_type": "imagenet_class_id", "class_id": 340, "class_name": "zebra", "replicate": 2, "generation_seed": 3145583327}
+{"sample_id": "imagenet-0340-r03", "condition_type": "imagenet_class_id", "class_id": 340, "class_name": "zebra", "replicate": 3, "generation_seed": 973904645}
+{"sample_id": "imagenet-0340-r04", "condition_type": "imagenet_class_id", "class_id": 340, "class_name": "zebra", "replicate": 4, "generation_seed": 3478007237}
+{"sample_id": "imagenet-0386-r00", "condition_type": "imagenet_class_id", "class_id": 386, "class_name": "African elephant", "replicate": 0, "generation_seed": 4229311049}
+{"sample_id": "imagenet-0386-r01", "condition_type": "imagenet_class_id", "class_id": 386, "class_name": "African elephant", "replicate": 1, "generation_seed": 2125777037}
+{"sample_id": "imagenet-0386-r02", "condition_type": "imagenet_class_id", "class_id": 386, "class_name": "African elephant", "replicate": 2, "generation_seed": 1767176565}
+{"sample_id": "imagenet-0386-r03", "condition_type": "imagenet_class_id", "class_id": 386, "class_name": "African elephant", "replicate": 3, "generation_seed": 1483241893}
+{"sample_id": "imagenet-0386-r04", "condition_type": "imagenet_class_id", "class_id": 386, "class_name": "African elephant", "replicate": 4, "generation_seed": 2565544400}
+{"sample_id": "imagenet-0402-r00", "condition_type": "imagenet_class_id", "class_id": 402, "class_name": "acoustic guitar", "replicate": 0, "generation_seed": 3605256792}
+{"sample_id": "imagenet-0402-r01", "condition_type": "imagenet_class_id", "class_id": 402, "class_name": "acoustic guitar", "replicate": 1, "generation_seed": 1661899047}
+{"sample_id": "imagenet-0402-r02", "condition_type": "imagenet_class_id", "class_id": 402, "class_name": "acoustic guitar", "replicate": 2, "generation_seed": 2361107161}
+{"sample_id": "imagenet-0402-r03", "condition_type": "imagenet_class_id", "class_id": 402, "class_name": "acoustic guitar", "replicate": 3, "generation_seed": 1625635636}
+{"sample_id": "imagenet-0402-r04", "condition_type": "imagenet_class_id", "class_id": 402, "class_name": "acoustic guitar", "replicate": 4, "generation_seed": 2852249529}
+{"sample_id": "imagenet-0404-r00", "condition_type": "imagenet_class_id", "class_id": 404, "class_name": "airliner", "replicate": 0, "generation_seed": 2643826536}
+{"sample_id": "imagenet-0404-r01", "condition_type": "imagenet_class_id", "class_id": 404, "class_name": "airliner", "replicate": 1, "generation_seed": 3565464698}
+{"sample_id": "imagenet-0404-r02", "condition_type": "imagenet_class_id", "class_id": 404, "class_name": "airliner", "replicate": 2, "generation_seed": 2528585925}
+{"sample_id": "imagenet-0404-r03", "condition_type": "imagenet_class_id", "class_id": 404, "class_name": "airliner", "replicate": 3, "generation_seed": 2894357191}
+{"sample_id": "imagenet-0404-r04", "condition_type": "imagenet_class_id", "class_id": 404, "class_name": "airliner", "replicate": 4, "generation_seed": 1879787851}
+{"sample_id": "imagenet-0620-r00", "condition_type": "imagenet_class_id", "class_id": 620, "class_name": "laptop", "replicate": 0, "generation_seed": 4130518319}
+{"sample_id": "imagenet-0620-r01", "condition_type": "imagenet_class_id", "class_id": 620, "class_name": "laptop", "replicate": 1, "generation_seed": 3545404075}
+{"sample_id": "imagenet-0620-r02", "condition_type": "imagenet_class_id", "class_id": 620, "class_name": "laptop", "replicate": 2, "generation_seed": 3841925856}
+{"sample_id": "imagenet-0620-r03", "condition_type": "imagenet_class_id", "class_id": 620, "class_name": "laptop", "replicate": 3, "generation_seed": 2234488903}
+{"sample_id": "imagenet-0620-r04", "condition_type": "imagenet_class_id", "class_id": 620, "class_name": "laptop", "replicate": 4, "generation_seed": 2896367035}
+{"sample_id": "imagenet-0779-r00", "condition_type": "imagenet_class_id", "class_id": 779, "class_name": "school bus", "replicate": 0, "generation_seed": 1987431274}
+{"sample_id": "imagenet-0779-r01", "condition_type": "imagenet_class_id", "class_id": 779, "class_name": "school bus", "replicate": 1, "generation_seed": 125061150}
+{"sample_id": "imagenet-0779-r02", "condition_type": "imagenet_class_id", "class_id": 779, "class_name": "school bus", "replicate": 2, "generation_seed": 2397574434}
+{"sample_id": "imagenet-0779-r03", "condition_type": "imagenet_class_id", "class_id": 779, "class_name": "school bus", "replicate": 3, "generation_seed": 1330150588}
+{"sample_id": "imagenet-0779-r04", "condition_type": "imagenet_class_id", "class_id": 779, "class_name": "school bus", "replicate": 4, "generation_seed": 4041254664}
+{"sample_id": "imagenet-0817-r00", "condition_type": "imagenet_class_id", "class_id": 817, "class_name": "sports car", "replicate": 0, "generation_seed": 374178482}
+{"sample_id": "imagenet-0817-r01", "condition_type": "imagenet_class_id", "class_id": 817, "class_name": "sports car", "replicate": 1, "generation_seed": 3090878218}
+{"sample_id": "imagenet-0817-r02", "condition_type": "imagenet_class_id", "class_id": 817, "class_name": "sports car", "replicate": 2, "generation_seed": 2381962886}
+{"sample_id": "imagenet-0817-r03", "condition_type": "imagenet_class_id", "class_id": 817, "class_name": "sports car", "replicate": 3, "generation_seed": 3485208188}
+{"sample_id": "imagenet-0817-r04", "condition_type": "imagenet_class_id", "class_id": 817, "class_name": "sports car", "replicate": 4, "generation_seed": 357602277}
+{"sample_id": "imagenet-0963-r00", "condition_type": "imagenet_class_id", "class_id": 963, "class_name": "pizza", "replicate": 0, "generation_seed": 3486788632}
+{"sample_id": "imagenet-0963-r01", "condition_type": "imagenet_class_id", "class_id": 963, "class_name": "pizza", "replicate": 1, "generation_seed": 105300213}
+{"sample_id": "imagenet-0963-r02", "condition_type": "imagenet_class_id", "class_id": 963, "class_name": "pizza", "replicate": 2, "generation_seed": 2162239771}
+{"sample_id": "imagenet-0963-r03", "condition_type": "imagenet_class_id", "class_id": 963, "class_name": "pizza", "replicate": 3, "generation_seed": 4006563985}
+{"sample_id": "imagenet-0963-r04", "condition_type": "imagenet_class_id", "class_id": 963, "class_name": "pizza", "replicate": 4, "generation_seed": 3423937710}

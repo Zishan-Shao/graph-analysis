@@ -1,0 +1,7 @@
+# Install a CUDA-compatible PyTorch build for your machine separately.
+diffusers==0.36.0
+transformers==4.57.6
+accelerate==1.14.0
+numpy==1.26.4
+Pillow==12.1.1
+safetensors==0.8.0

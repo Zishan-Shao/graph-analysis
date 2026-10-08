@@ -1,0 +1,8 @@
+# Downloaded source data and generated outputs stay outside Git.
+data/raw/
+data/generated/
+*.pyc
+__pycache__/
+.pytest_cache/
+.venv/
+

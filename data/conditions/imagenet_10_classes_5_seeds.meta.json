@@ -1,0 +1,20 @@
+{
+  "condition_source": "ImageNet-1K class indices; no source images are sampled",
+  "class_index_url": "https://raw.githubusercontent.com/pytorch/hub/c3beaae7d32fca2a23fec30aa7938ef5c9b6e5d5/imagenet_classes.txt",
+  "class_index_sha256": "1f386e0d1cb6e28b9c2dac651c3dea6801e98ad1b41a14ce6bb1a093d72069f5",
+  "selected_class_ids": [
+    207,
+    281,
+    340,
+    386,
+    402,
+    404,
+    620,
+    779,
+    817,
+    963
+  ],
+  "replicates_per_class": 5,
+  "generation_seed_base": 2026,
+  "count": 50
+}
